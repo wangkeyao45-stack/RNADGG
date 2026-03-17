@@ -1,8 +1,4 @@
-# Human 5′ UTR Design and Variant Effect Prediction
 
-Predicting the impact of cis-regulatory sequence on gene expression using deep learning. This project combines polysome profiling of hundreds of thousands of randomized 5′ UTRs with neural networks to build predictive models that relate human 5′ UTR sequence to translation. Together with genetic algorithms and reinforcement learning, the models engineer new 5′ UTRs that target specified levels of ribosome loading.
-
-**Reference:** [Sample et al., Nature Biotechnology (2019)](https://www.nature.com/articles/s41587-019-0164-5)
 
 <p align="center">
   <img src="graphic_abstract_01.png" alt="RNADGG graphic abstract" width="900"/>
