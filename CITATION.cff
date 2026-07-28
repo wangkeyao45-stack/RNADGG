@@ -5,7 +5,7 @@ type: software
 authors:
   - family-names: Wang
     given-names: Keyao
-repository-code: "https://github.com/<your-user>/RNADGG"
+repository-code: "https://github.com/wangkeyao45-stack/RNADGG"
 license: GPL-3.0-only
 keywords:
   - RNA design

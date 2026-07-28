@@ -1,0 +1,10 @@
+{
+  "task": "rbs",
+  "data": "data/processed/rbs_data.csv",
+  "sequence_column": "sequence",
+  "label_column": "rl",
+  "sequence_length": 17,
+  "seed": 42,
+  "diffusion_steps": 500,
+  "guidance_scale": 1.0
+}

@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rnadgg"
+version = "0.1.0"
+description = "Gradient-guided diffusion for functional regulatory RNA sequence design"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "GPL-3.0-only"}
+authors = [{name = "Keyao Wang"}]
+dependencies = [
+    "numpy>=1.23",
+    "pandas>=1.5",
+    "scipy>=1.9",
+    "scikit-learn>=1.1",
+    "torch>=1.13",
+    "matplotlib>=3.6",
+    "seaborn>=0.12",
+    "tqdm>=4.64",
+    "logomaker>=0.8",
+    "python-Levenshtein>=0.20"
+]
+
+[project.scripts]
+rnadgg-smoke = "rnadgg.smoke:run_smoke_test"
