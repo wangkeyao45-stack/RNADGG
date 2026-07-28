@@ -28,4 +28,4 @@ GSM3130443_designed_library.csv
 
 ## Git policy
 
-Full data tables are intentionally excluded from git through `.gitignore`. This keeps the repository lightweight and avoids committing derived data files by accident. For archival publication, deposit full datasets and generated sequence libraries in a data repository such as Zenodo, Figshare, OSF or an institutional repository, then add the DOI to this file.
+Full data tables are excluded from git through `.gitignore`. This keeps the repository lightweight and reduces the risk of committing derived data files by accident. For archival publication, deposit full datasets and generated sequence libraries in a data repository such as Zenodo, Figshare, OSF or an institutional repository, then add the DOI to this file.

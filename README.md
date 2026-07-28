@@ -2,26 +2,26 @@
 
 Gradient-guided diffusion for functional regulatory RNA sequence design.
 
-RNADGG combines a diffusion sequence generator with assay-trained sequence-to-function predictors, referred to as Oracles, to guide regulatory RNA sequence generation toward desired reporter-assay readouts. This repository provides a cleaned code release for the RNADGG manuscript, including reusable core modules, lightweight command-line utilities and archived standalone experiment scripts.
+RNADGG combines a diffusion sequence generator with assay-trained sequence-to-function predictors, referred to as Oracles, to guide regulatory RNA sequence generation toward desired reporter-assay readouts. This repository contains the core code used to organize RNADGG models, data handling and lightweight reproduction utilities.
 
 <p align="center">
   <img src="docs/graphic_abstract.png" alt="RNADGG graphical abstract" width="850"/>
 </p>
 
-## What is in this release
+## Repository structure
 
 ```text
 RNADGG/
-  rnadgg/       Reusable Python package: sequence utilities, models, data loading and diffusion helpers
+  rnadgg/       Python package for sequence utilities, models, data loading and diffusion helpers
   scripts/      Small command-line utilities for smoke tests and dataset inspection
   configs/      Example experiment configuration files
   data/         Local data directory, not tracked by git
   models/       Local checkpoints, not tracked by git
   results/      Local generated outputs, not tracked by git
-  docs/         Data, reproducibility and code-organization notes
+  docs/         Data, reproducibility and code organization notes
 ```
 
-The `rnadgg/` package is the clean entry point for new use. Historical standalone scripts were moved out of the upload-ready tree and kept as a local backup, because many were one-off development scripts with duplicated code and inconsistent console text.
+The `rnadgg/` package is the main entry point. Development notebooks, debug scripts, generated outputs and local checkpoints are not included in the repository.
 
 ## Installation
 
@@ -85,9 +85,9 @@ data/raw/GSM3130443_designed_library.csv
 
 See [docs/DATA.md](docs/DATA.md) for dataset provenance.
 
-## Running a compact RBS workflow
+## RBS example workflow
 
-The reusable modules in `rnadgg/` cover shared building blocks: sequence encoding, Oracles, the 1D U-Net denoiser and a minimal guided diffusion wrapper. A compact parameterized RBS workflow is provided as:
+The package provides shared building blocks for sequence encoding, Oracle training, the 1D U-Net denoiser and guided diffusion sampling. A small RBS workflow is provided as:
 
 ```bash
 python scripts/run_diffusion_rbs.py \
@@ -97,23 +97,17 @@ python scripts/run_diffusion_rbs.py \
   --output-dir results/rbs_diffusion_g1
 ```
 
-This script replaces several historical RBS scripts that differed mainly in guidance scale and output directory.
+The guidance scale, number of diffusion steps, number of generated sequences and output directory can be changed from the command line.
 
-## Manuscript-style runs
+## Reproducing full analyses
 
-Full manuscript reproduction also depends on exact generated sequence libraries, benchmark tables and model checkpoints. These files should be distributed through an external archive with a DOI rather than committed to GitHub. The current repository is organized as a clean code release, with generated data and checkpoints excluded from git.
-
-For local reference, the original standalone development scripts are backed up outside this upload directory at:
-
-```bash
-C:/Users/Admin/Documents/Codex/2026-06-17/rnadgg/outputs/github_ready/RNADGG_legacy_standalone_scripts_backup
-```
+Full manuscript reproduction also depends on exact generated sequence libraries, benchmark tables and model checkpoints. These files should be distributed through an external archive with a DOI rather than committed to GitHub. Generated data and checkpoints are therefore excluded from this repository.
 
 See [docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md) for details.
 
 ## Output policy
 
-Generated checkpoints, logs, figures and sequence libraries should be written to `models/` or `results/`. These directories are intentionally ignored by git. For publication-level reproducibility, archive generated sequence libraries and benchmark tables in a data repository such as Zenodo, Figshare, OSF or an institutional repository.
+Generated checkpoints, logs, figures and sequence libraries should be written to `models/` or `results/`. These directories are ignored by git. For publication-level reproducibility, archive generated sequence libraries and benchmark tables in a data repository such as Zenodo, Figshare, OSF or an institutional repository.
 
 ## Citation
 

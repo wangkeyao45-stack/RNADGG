@@ -2,7 +2,7 @@
 
 ## `rnadgg/`
 
-Reusable Python package for new work.
+Python package for model development and small reproduction workflows.
 
 - `sequence.py`: one-hot encoding, decoding and simple sequence statistics.
 - `data.py`: CSV loading helpers for sequence-function tables.
@@ -12,10 +12,10 @@ Reusable Python package for new work.
 
 ## `scripts/`
 
-Small command-line utilities intended as clean public entry points.
+Small command-line utilities for dataset inspection, smoke tests and example runs.
 
-The main public scripts are intentionally small and parameterized. Historical standalone scripts were moved out of this upload-ready tree because they duplicated model definitions and included one-off local configuration.
+The public scripts are parameterized and use the shared package modules.
 
 ## Excluded from this release
 
-Debug, sandbox and historical standalone scripts were not included in the clean GitHub-ready tree because they duplicate formal analyses, contain exploratory code, or include hard-coded local paths.
+Debug and sandbox scripts are not included because they duplicate formal analyses, contain exploratory code, or include hard-coded local paths.

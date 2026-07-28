@@ -14,7 +14,7 @@ The smoke test does not load data and should finish in seconds.
 
 Copy the processed task CSVs into `data/processed/`. Scripts in `scripts/` accept explicit paths and write outputs to `results/`.
 
-## 3. Representative clean workflow
+## 3. Representative workflow
 
 Compact RBS diffusion guidance run:
 
@@ -28,7 +28,7 @@ python scripts/run_diffusion_rbs.py \
 
 ## 4. Manuscript-level reproduction
 
-The upload-ready repository keeps clean code and excludes large generated outputs. Full manuscript-level reproduction should be paired with an external archive containing exact processed datasets, generated sequence libraries, benchmark tables and checkpoints.
+This repository excludes large generated outputs. Full manuscript-level reproduction should be paired with an external archive containing exact processed datasets, generated sequence libraries, benchmark tables and checkpoints.
 
 ## 5. Output policy
 
@@ -36,4 +36,4 @@ Write generated checkpoints, figures, logs and sequence libraries to `models/` o
 
 ## Known limitations of this code release
 
-The public upload tree now favors reusable modules and parameterized scripts. Historical one-off scripts are not included in the clean tree because they duplicate model definitions and require local configuration cleanup before public release.
+The repository uses reusable modules and parameterized scripts. One-off development scripts are not included because they duplicated model definitions and depended on local configuration.
