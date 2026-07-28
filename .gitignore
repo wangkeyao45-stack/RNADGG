@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Environments
+.venv/
+venv/
+env/
+*.egg-info/
+
+# Data and generated artifacts
+data/raw/*
+data/processed/*
+models/*
+results/*
+outputs/*
+Model_results/*
+model/*
+*.pt
+*.pth
+*.ckpt
+*.h5
+*.pkl
+*.npz
+
+# Keep directory placeholders
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!models/.gitkeep
+!results/.gitkeep
+
+# Logs and temporary outputs
+*.log
+*.out
+*.aux
+*.toc
+*.tmp
+*.bak
+nohup.out
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

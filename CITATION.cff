@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+title: "RNADGG: Gradient-Guided Diffusion for Functional Regulatory RNA Sequence Design"
+message: "If you use this software, please cite the associated RNADGG manuscript and the dataset sources."
+type: software
+authors:
+  - family-names: Wang
+    given-names: Keyao
+repository-code: "https://github.com/<your-user>/RNADGG"
+license: GPL-3.0-only
+keywords:
+  - RNA design
+  - diffusion models
+  - regulatory RNA
+  - sequence-function prediction
+  - MPRA
+references:
+  - type: article
+    title: "Human 5-prime UTR design and variant effect prediction from a massively parallel translation assay"
+    authors:
+      - family-names: Sample
+        given-names: Peter J.
+    doi: "10.1038/s41587-019-0164-5"
+  - type: article
+    title: "Large-scale DNA-based phenotypic recording and deep learning enable highly accurate sequence-function mapping"
+    doi: "10.1038/s41467-020-17222-4"
+  - type: article
+    title: "A deep learning approach to programmable RNA switches"
+    doi: "10.1038/s41467-020-18677-1"
