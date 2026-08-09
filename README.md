@@ -2,7 +2,7 @@
 
 Gradient-guided diffusion for functional regulatory RNA sequence design.
 
-RNADGG combines a diffusion sequence generator with assay-trained sequence-to-function predictors, referred to as Oracles, to guide regulatory RNA sequence generation toward desired reporter-assay readouts. This repository contains the core code used to organize RNADGG models, data handling and lightweight reproduction utilities.
+RNADGG combines a diffusion sequence generator with assay-trained sequence-to-function predictors, referred to as Oracles, to guide regulatory RNA sequence generation toward desired reporter-assay readouts. This repository contains the shared model components, the manuscript gradient-guidance update, data-handling utilities and a compact RBS example.
 
 <p align="center">
   <img src="docs/graphic_abstract.png" alt="RNADGG graphical abstract" width="850"/>
@@ -25,7 +25,7 @@ The `rnadgg/` package is the main entry point. Development notebooks, debug scri
 
 ## Installation
 
-Python 3.8 or newer is recommended. A CUDA-capable GPU is recommended for full training, although the smoke test can run on CPU.
+Python 3.10 or newer is required. A CUDA-capable GPU is recommended for training, although the smoke test and unit tests can run on CPU.
 
 ```bash
 git clone https://github.com/wangkeyao45-stack/RNADGG.git
@@ -57,6 +57,12 @@ or:
 
 ```bash
 python scripts/run_smoke_test.py
+```
+
+Run the guidance regression tests:
+
+```bash
+python -m unittest discover -s tests -v
 ```
 
 Inspect a dataset after placing it under `data/processed/`:
@@ -99,9 +105,9 @@ python scripts/run_diffusion_rbs.py \
 
 The guidance scale, number of diffusion steps, number of generated sequences and output directory can be changed from the command line.
 
-## Reproducing full analyses
+## Scope of this release
 
-Full manuscript reproduction also depends on exact generated sequence libraries, benchmark tables and model checkpoints. These files should be distributed through an external archive with a DOI rather than committed to GitHub. Generated data and checkpoints are therefore excluded from this repository.
+The RBS command is a compact example, not a frozen reproduction of every manuscript benchmark. Full reproduction additionally requires the task-specific UTR and toehold drivers, exact data partitions, generated sequence libraries, benchmark tables, configurations and model checkpoints. Until those artifacts are deposited, the repository should be interpreted as an illustrative implementation of the shared method rather than a complete manuscript reproduction package.
 
 See [docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md) for details.
 

@@ -5,6 +5,12 @@
   "label_column": "rl",
   "sequence_length": 17,
   "seed": 42,
+  "split": "80/10/10",
+  "oracle_epochs": 30,
+  "diffusion_epochs": 80,
+  "oracle_batch_size": 256,
+  "diffusion_batch_size": 64,
+  "channels": 128,
   "diffusion_steps": 500,
   "guidance_scale": 1.0
 }

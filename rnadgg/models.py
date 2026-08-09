@@ -93,7 +93,9 @@ class UNet1D(nn.Module):
         self.in_conv = nn.Conv1d(alphabet_size, channels, 3, padding=1)
         self.down1 = UpDownBlock(channels, channels * 2, time_dim, down=True)
         self.down2 = UpDownBlock(channels * 2, channels * 4, time_dim, down=True)
-        self.mid = ResidualBlock(channels * 4, channels * 4, time_dim)
+        self.mid1 = ResidualBlock(channels * 4, channels * 4, time_dim)
+        self.mid_attention = AttentionBlock(channels * 4)
+        self.mid2 = ResidualBlock(channels * 4, channels * 4, time_dim)
         self.up1 = UpDownBlock(channels * 8, channels * 2, time_dim, down=False)
         self.up2 = UpDownBlock(channels * 4, channels, time_dim, down=False)
         self.out = nn.Conv1d(channels * 2, alphabet_size, 1)
@@ -103,7 +105,9 @@ class UNet1D(nn.Module):
         x0 = self.in_conv(x)
         x1 = self.down1(x0, t_emb)
         x2 = self.down2(x1, t_emb)
-        xm = self.mid(x2, t_emb)
+        xm = self.mid1(x2, t_emb)
+        xm = self.mid_attention(xm)
+        xm = self.mid2(xm, t_emb)
         u1 = self.up1(torch.cat([xm, x2], dim=1), t_emb)
         u1 = F.interpolate(u1, size=x1.shape[2])
         u2 = self.up2(torch.cat([u1, x1], dim=1), t_emb)
@@ -114,7 +118,7 @@ class UNet1D(nn.Module):
 class OracleCNN(nn.Module):
     """CNN sequence-to-function predictor used for gradient guidance."""
 
-    def __init__(self, sequence_length: int, alphabet_size: int = 4, dropout: float = 0.0):
+    def __init__(self, sequence_length: int, alphabet_size: int = 4, dropout: float = 0.3):
         super().__init__()
         pooled_length = max(sequence_length // 4, 1)
         self.features = nn.Sequential(

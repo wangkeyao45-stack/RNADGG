@@ -46,5 +46,7 @@ nohup.out
 # OS and editor files
 .DS_Store
 Thumbs.db
+NUL
+_NUL.txt
 .vscode/
 .idea/

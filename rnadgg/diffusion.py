@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 import torch
 from torch import nn
 
@@ -33,6 +35,10 @@ class GaussianDiffusion:
         """Single reverse step without Oracle guidance."""
         t_batch = torch.full((x.shape[0],), t, device=x.device, dtype=torch.long)
         predicted_noise = model(x, t_batch)
+        return self._reverse_step(x, predicted_noise, t)
+
+    def _reverse_step(self, x: torch.Tensor, predicted_noise: torch.Tensor, t: int) -> torch.Tensor:
+        """Apply one Gaussian reverse step from a supplied noise prediction."""
         alpha = self.alphas[t]
         alpha_bar = self.alpha_bars[t]
         beta = self.betas[t]
@@ -41,14 +47,50 @@ class GaussianDiffusion:
             return mean
         return mean + beta.sqrt() * torch.randn_like(x)
 
+    def _oracle_gradient(
+        self,
+        oracle: nn.Module,
+        x: torch.Tensor,
+        objective_fn: Callable[[torch.Tensor], torch.Tensor] | None,
+        clip_value: float,
+    ) -> torch.Tensor:
+        """Return a batch-size-invariant gradient of the per-sequence objective."""
+        x_for_grad = x.detach().requires_grad_(True)
+        oracle_output = oracle(x_for_grad)
+        per_sequence = (
+            objective_fn(oracle_output)
+            if objective_fn is not None
+            else oracle_output.reshape(x.shape[0], -1).sum(dim=1)
+        )
+        if per_sequence.shape != (x.shape[0],):
+            raise ValueError("objective_fn must return one scalar per sequence")
+        gradient = torch.autograd.grad(per_sequence.sum(), x_for_grad)[0]
+        return gradient.detach().clamp(-clip_value, clip_value)
+
+    def _guided_noise_prediction(
+        self,
+        predicted_noise: torch.Tensor,
+        gradient: torch.Tensor,
+        t: int,
+        guidance_scale: float,
+    ) -> torch.Tensor:
+        """Apply the manuscript guidance update to the predicted noise."""
+        time_scale = (1.0 - self.alpha_bars[t]).sqrt()
+        return predicted_noise - time_scale * guidance_scale * gradient
+
     def sample(
         self,
         model: nn.Module,
         shape: tuple[int, int, int],
         oracle: nn.Module | None = None,
         guidance_scale: float = 0.0,
+        objective_fn: Callable[[torch.Tensor], torch.Tensor] | None = None,
+        gradient_clip: float = 1.0,
     ) -> torch.Tensor:
-        """Sample sequences, optionally guided by gradients from an Oracle."""
+        """Sample sequences with the gradient-guidance update used in the manuscript."""
+        if gradient_clip <= 0:
+            raise ValueError("gradient_clip must be positive")
+
         x = torch.randn(shape, device=self.device)
         model.eval()
         if oracle is not None:
@@ -56,9 +98,17 @@ class GaussianDiffusion:
 
         for t in reversed(range(self.timesteps)):
             if oracle is not None and guidance_scale > 0:
-                x = x.detach().requires_grad_(True)
-                score = oracle(x).mean()
-                grad = torch.autograd.grad(score, x)[0]
-                x = x.detach() + guidance_scale * grad.detach()
-            x = self.denoise_step(model, x, t)
+                with torch.enable_grad():
+                    gradient = self._oracle_gradient(
+                        oracle, x, objective_fn=objective_fn, clip_value=gradient_clip
+                    )
+                with torch.no_grad():
+                    t_batch = torch.full((x.shape[0],), t, device=x.device, dtype=torch.long)
+                    predicted_noise = model(x.detach(), t_batch)
+                    guided_noise = self._guided_noise_prediction(
+                        predicted_noise, gradient, t, guidance_scale
+                    )
+                    x = self._reverse_step(x.detach(), guided_noise, t)
+            else:
+                x = self.denoise_step(model, x, t)
         return x

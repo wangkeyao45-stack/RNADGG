@@ -35,10 +35,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-dir", type=Path, default=Path("results/rbs_diffusion"))
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--nrows", type=int, default=None)
-    parser.add_argument("--oracle-epochs", type=int, default=20)
-    parser.add_argument("--diffusion-epochs", type=int, default=20)
-    parser.add_argument("--batch-size", type=int, default=256)
-    parser.add_argument("--channels", type=int, default=64)
+    parser.add_argument("--oracle-epochs", type=int, default=30)
+    parser.add_argument("--diffusion-epochs", type=int, default=80)
+    parser.add_argument("--oracle-batch-size", type=int, default=256)
+    parser.add_argument("--diffusion-batch-size", type=int, default=64)
+    parser.add_argument("--channels", type=int, default=128)
     parser.add_argument("--timesteps", type=int, default=500)
     parser.add_argument("--guidance-scale", type=float, default=1.0)
     parser.add_argument("--num-samples", type=int, default=1024)
@@ -67,9 +68,15 @@ def main() -> None:
     x = sequences_to_tensor(sequences, device=device)
     y = torch.tensor(labels.to_numpy(), dtype=torch.float32, device=device)
 
-    idx_train, idx_val = train_test_split(range(len(sequences)), test_size=0.1, random_state=args.seed)
+    idx_train, idx_holdout = train_test_split(
+        range(len(sequences)), test_size=0.2, random_state=args.seed
+    )
+    idx_val, idx_test = train_test_split(
+        idx_holdout, test_size=0.5, random_state=args.seed
+    )
     x_train, y_train = x[idx_train], y[idx_train]
     x_val, y_val = x[idx_val], y[idx_val]
+    x_test, y_test = x[idx_test], y[idx_test]
 
     oracle = OracleCNN(sequence_length=sequence_length).to(device)
     oracle = train_oracle(
@@ -79,7 +86,7 @@ def main() -> None:
         x_val=x_val,
         y_val=y_val,
         epochs=args.oracle_epochs,
-        batch_size=args.batch_size,
+        batch_size=args.oracle_batch_size,
     )
 
     denoiser = UNet1D(channels=args.channels).to(device)
@@ -89,7 +96,7 @@ def main() -> None:
         diffusion,
         x_train,
         epochs=args.diffusion_epochs,
-        batch_size=args.batch_size,
+        batch_size=args.diffusion_batch_size,
     )
 
     generated = diffusion.sample(
@@ -101,11 +108,13 @@ def main() -> None:
     generated_sequences = decode_one_hot(generated)
     with torch.no_grad():
         scores = oracle(generated).squeeze(-1).detach().cpu().numpy()
+        test_mse = torch.mean((oracle(x_test).squeeze(-1) - y_test) ** 2).item()
 
     out = pd.DataFrame({"sequence": generated_sequences, "oracle_score": scores})
     out.to_csv(output_dir / "generated_sequences.csv", index=False)
     torch.save(oracle.state_dict(), output_dir / "oracle.pt")
     torch.save(denoiser.state_dict(), output_dir / "denoiser.pt")
+    print(f"Held-out test MSE: {test_mse:.6f}")
     print(f"Saved generated sequences and checkpoints to {output_dir}")
 
 
