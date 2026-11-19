@@ -7,6 +7,7 @@ This document records the recommended order for checking and reproducing RNADGG 
 ```bash
 python -m rnadgg.smoke
 python -m unittest discover -s tests -v
+python scripts/check_release.py
 ```
 
 The smoke test does not load data and should finish in seconds.
@@ -27,6 +28,10 @@ python scripts/run_diffusion_rbs.py \
   --output-dir results/rbs_diffusion_g1
 ```
 
+Keep `run_config.json` alongside the two model checkpoints and `generated_sequences.csv`. It records the supplied arguments, sequence length, noise-schedule endpoints, device and PyTorch version. The example uses a seeded 80/10/10 row split. It does not provide the frozen split manifests used in the manuscript.
+
+The exported `oracle_score` is evaluated on the decoded nucleotide sequence after re-encoding it as one-hot, rather than on the continuous final diffusion state. This example reports raw predictor scores without the benchmark-specific clipping described in the manuscript. Predictor scores estimate activity and are not new experimental measurements.
+
 ## 4. Guidance implementation
 
 The implementation in `rnadgg/diffusion.py` applies the manuscript update to the predicted noise:
@@ -35,7 +40,7 @@ The implementation in `rnadgg/diffusion.py` applies the manuscript update to the
 guided_noise = predicted_noise - sqrt(1 - alpha_bar_t) * gamma * clipped_oracle_gradient
 ```
 
-Oracle gradients are computed from a sum of per-sequence objectives, so their scale does not shrink with batch size. Gradients are clipped elementwise to `[-1, 1]` by default.
+Predictor gradients are computed from a sum of per-sequence objectives, so their scale does not shrink with batch size. Gradients are clipped elementwise to `[-1, 1]` by default. See [DIFFUSION.md](DIFFUSION.md) for the forward and reverse distributions and noise-prediction objective.
 
 ## 5. Manuscript-level reproduction
 

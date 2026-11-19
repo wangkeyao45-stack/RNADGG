@@ -25,3 +25,6 @@ dependencies = [
 
 [project.scripts]
 rnadgg-smoke = "rnadgg.smoke:run_smoke_test"
+
+[tool.setuptools.packages.find]
+include = ["rnadgg*"]

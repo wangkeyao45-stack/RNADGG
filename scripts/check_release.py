@@ -11,8 +11,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
 SENSITIVE_PATTERNS = [
-    re.compile(r"202\.120\.54\.218"),
-    re.compile(r"C:\\Users\\Admin", re.IGNORECASE),
+    re.compile(r"[A-Z]:\\Users\\[^\\\s]+", re.IGNORECASE),
     re.compile(r"password\s*=", re.IGNORECASE),
     re.compile(r"passwd\s*=", re.IGNORECASE),
     re.compile(r"HostName\s+\d+\.\d+\.\d+\.\d+", re.IGNORECASE),
@@ -22,10 +21,27 @@ BLOCKED_EXTENSIONS = {".pyc", ".pyo", ".pt", ".pth", ".ckpt", ".pkl", ".npz", ".
 MAX_TRACKED_FILE_MB = 10
 
 
+def release_files() -> list[Path]:
+    """List tracked and candidate files, excluding ignored local artifacts."""
+    result = subprocess.run(
+        ["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"],
+        cwd=PROJECT_ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+    )
+    return [
+        path
+        for name in dict.fromkeys(result.stdout.split("\0"))
+        if name and (path := PROJECT_ROOT / name).is_file()
+    ]
+
+
 def check_python_syntax() -> None:
     errors: list[str] = []
-    for path in PROJECT_ROOT.rglob("*.py"):
-        if ".git" in path.parts:
+    for path in release_files():
+        if path.suffix != ".py":
             continue
         try:
             compile(path.read_text(encoding="utf-8", errors="replace"), str(path), "exec")
@@ -39,9 +55,7 @@ def check_python_syntax() -> None:
 def check_sensitive_text() -> None:
     hits: list[str] = []
     checker = Path(__file__).resolve()
-    for path in PROJECT_ROOT.rglob("*"):
-        if not path.is_file() or ".git" in path.parts or "__pycache__" in path.parts:
-            continue
+    for path in release_files():
         if path.resolve() == checker:
             continue
         if path.suffix.lower() in {".png", ".jpg", ".jpeg", ".tif", ".tiff", ".pdf", ".docx"}:
@@ -57,9 +71,7 @@ def check_sensitive_text() -> None:
 
 def check_large_or_blocked_files() -> None:
     problems: list[str] = []
-    for path in PROJECT_ROOT.rglob("*"):
-        if not path.is_file() or ".git" in path.parts or "__pycache__" in path.parts:
-            continue
+    for path in release_files():
         rel = path.relative_to(PROJECT_ROOT)
         if path.suffix.lower() in BLOCKED_EXTENSIONS:
             problems.append(f"blocked extension: {rel}")

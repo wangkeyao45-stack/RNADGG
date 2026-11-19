@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 
@@ -27,12 +28,15 @@ def load_sequence_table(
 ) -> tuple[list[str], pd.Series, pd.DataFrame]:
     """Load a sequence-function CSV table.
 
-    Returns `(sequences, labels, dataframe)`.
+    Returns `(sequences, labels, dataframe)`. Rows without a sequence or a
+    finite numeric label are excluded.
     """
     table = pd.read_csv(path, nrows=nrows)
     seq_col = sequence_column or find_column(table, COMMON_SEQUENCE_COLUMNS, "sequence")
     label_col = label_column or find_column(table, COMMON_LABEL_COLUMNS, "label")
-    sequences = table[seq_col].astype(str).str.upper().tolist()
+    sequences = table[seq_col].astype("string").str.strip().str.upper()
     labels = pd.to_numeric(table[label_col], errors="coerce")
-    valid = labels.notna()
-    return [seq for seq, keep in zip(sequences, valid) if keep], labels[valid].astype(float), table[valid]
+    valid = sequences.notna() & sequences.ne("") & np.isfinite(labels)
+    if not valid.any():
+        raise ValueError("No rows with a non-empty sequence and a finite numeric label.")
+    return sequences[valid].tolist(), labels[valid].astype(float), table[valid]

@@ -7,14 +7,19 @@ from collections.abc import Iterable
 import numpy as np
 import torch
 
-from .constants import DNA_ALPHABET
+from .constants import DNA_ALPHABET, RNA_ALPHABET
 
 
 def one_hot_encode(sequence: str, alphabet: str = DNA_ALPHABET) -> np.ndarray:
-    """Encode a DNA or RNA sequence as an array with shape `(alphabet, length)`."""
+    """Encode a sequence, mapping U/T to the selected nucleotide alphabet."""
+    sequence = sequence.upper()
+    if alphabet == DNA_ALPHABET:
+        sequence = sequence.replace("U", "T")
+    elif alphabet == RNA_ALPHABET:
+        sequence = sequence.replace("T", "U")
     lookup = {base: i for i, base in enumerate(alphabet)}
     encoded = np.zeros((len(alphabet), len(sequence)), dtype=np.float32)
-    for pos, base in enumerate(sequence.upper()):
+    for pos, base in enumerate(sequence):
         if base not in lookup:
             raise ValueError(f"Unsupported base {base!r}; expected one of {alphabet!r}.")
         encoded[lookup[base], pos] = 1.0

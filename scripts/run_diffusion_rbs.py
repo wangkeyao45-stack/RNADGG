@@ -9,6 +9,7 @@ candidate sequences.
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 import sys
 
@@ -106,14 +107,30 @@ def main() -> None:
         guidance_scale=args.guidance_scale,
     )
     generated_sequences = decode_one_hot(generated)
+    # Report scores for the exported nucleotides, not their continuous precursor.
+    encoded_sequences = sequences_to_tensor(generated_sequences, device=device)
     with torch.no_grad():
-        scores = oracle(generated).squeeze(-1).detach().cpu().numpy()
+        scores = oracle(encoded_sequences).squeeze(-1).detach().cpu().numpy()
         test_mse = torch.mean((oracle(x_test).squeeze(-1) - y_test) ** 2).item()
 
     out = pd.DataFrame({"sequence": generated_sequences, "oracle_score": scores})
     out.to_csv(output_dir / "generated_sequences.csv", index=False)
     torch.save(oracle.state_dict(), output_dir / "oracle.pt")
     torch.save(denoiser.state_dict(), output_dir / "denoiser.pt")
+    configuration = {
+        key: str(value) if isinstance(value, Path) else value
+        for key, value in vars(args).items()
+    }
+    configuration.update(
+        device=str(device),
+        sequence_length=sequence_length,
+        beta_start=float(diffusion.betas[0]),
+        beta_end=float(diffusion.betas[-1]),
+        torch_version=torch.__version__,
+    )
+    (output_dir / "run_config.json").write_text(
+        json.dumps(configuration, indent=2) + "\n", encoding="utf-8"
+    )
     print(f"Held-out test MSE: {test_mse:.6f}")
     print(f"Saved generated sequences and checkpoints to {output_dir}")
 

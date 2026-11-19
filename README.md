@@ -2,7 +2,7 @@
 
 Gradient-guided diffusion for functional regulatory RNA sequence design.
 
-RNADGG combines a diffusion sequence generator with assay-trained sequence-to-function predictors, referred to as Oracles, to guide regulatory RNA sequence generation toward desired reporter-assay readouts. This repository contains the shared model components, the manuscript gradient-guidance update, data-handling utilities and a compact RBS example.
+RNADGG combines a Gaussian diffusion model with function predictors trained on experimental RNA libraries to generate sequences toward desired activity. This repository contains the shared model components, gradient guidance, data-loading utilities and a compact RBS example. The predictor class retains the name `OracleCNN` for compatibility with earlier code.
 
 <p align="center">
   <img src="docs/graphic_abstract.png" alt="RNADGG graphical abstract" width="850"/>
@@ -59,7 +59,7 @@ or:
 python scripts/run_smoke_test.py
 ```
 
-Run the guidance regression tests:
+Run the regression tests:
 
 ```bash
 python -m unittest discover -s tests -v
@@ -93,7 +93,7 @@ See [docs/DATA.md](docs/DATA.md) for dataset provenance.
 
 ## RBS example workflow
 
-The package provides shared building blocks for sequence encoding, Oracle training, the 1D U-Net denoiser and guided diffusion sampling. A small RBS workflow is provided as:
+The package provides shared building blocks for sequence encoding, function-predictor training, the 1D U-Net denoiser and guided diffusion sampling. A small RBS workflow is provided as:
 
 ```bash
 python scripts/run_diffusion_rbs.py \
@@ -105,11 +105,28 @@ python scripts/run_diffusion_rbs.py \
 
 The guidance scale, number of diffusion steps, number of generated sequences and output directory can be changed from the command line.
 
+The output directory contains `generated_sequences.csv`, the predictor and denoiser checkpoints, and `run_config.json` with the run settings. Each `oracle_score` is calculated from the one-hot encoding of the exported sequence after nucleotide decoding. Scores are raw predictor outputs, without clipping to the training-label range.
+
+## Diffusion implementation
+
+`GaussianDiffusion` implements a DDPM with standard Gaussian noise, a linear beta schedule and a U-Net trained to predict the added noise. Generation starts from Gaussian noise and applies the reverse updates, with optional predictor gradients, before argmax nucleotide decoding. The input uses A/C/G/T channels; RNA U is mapped to the T channel.
+
+See [docs/DIFFUSION.md](docs/DIFFUSION.md) for the equations and their implementation, including the distinction between the one-hot input mean of 0.25 and the noise mean of 0.
+
 ## Scope of this release
 
 The RBS command is a compact example, not a frozen reproduction of every manuscript benchmark. Full reproduction additionally requires the task-specific UTR and toehold drivers, exact data partitions, generated sequence libraries, benchmark tables, configurations and model checkpoints. Until those artifacts are deposited, the repository should be interpreted as an illustrative implementation of the shared method rather than a complete manuscript reproduction package.
 
 See [docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md) for details.
+
+## Development checks
+
+```bash
+python -m unittest discover -s tests -v
+python scripts/check_release.py
+```
+
+GitHub Actions runs the checks on CPU with Python 3.10 and 3.12. The release check inspects tracked and candidate files while excluding ignored datasets, checkpoints and local environments.
 
 ## Output policy
 
