@@ -84,10 +84,9 @@ strings before computing their reported predictor scores. The default alphabet
 stores U in the T channel and exports A/C/G/T strings.
 
 Continuous guidance and discrete decoding can favor different candidates;
-argmax also discards uncertainty among channels. With the default finite
-schedule, `alpha_bar_T` is approximately 0.00635, so the terminal state still
-retains a signal coefficient of approximately 0.0797. Initialization from a
-standard Gaussian is an approximation to this terminal distribution.
+argmax also discards uncertainty among channels. With a finite noise schedule,
+the terminal state can retain some input signal. Initialization from a standard
+Gaussian approximates this terminal distribution.
 
 The generic `GaussianDiffusion` and compact RBS example do not apply scaffold
 projection. The dedicated `benchmarks/toehold.py` driver projects the state at

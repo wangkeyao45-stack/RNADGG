@@ -4,6 +4,8 @@ Gradient-guided diffusion for functional regulatory RNA sequence design.
 
 RNADGG combines a Gaussian diffusion model with function predictors trained on experimental RNA libraries to generate sequences toward desired activity. This repository contains the shared model components, gradient guidance, data-loading utilities, a compact RBS example, UTR experiments and the grouped toehold weight series. The predictor class retains the name `OracleCNN` for compatibility with earlier code.
 
+This repository distributes code and usage instructions. Experimental result tables, performance figures, generated sequence libraries and trained weights are not included. Running the scripts writes outputs locally.
+
 <p align="center">
   <img src="docs/graphic_abstract.png" alt="RNADGG graphical abstract" width="850"/>
 </p>

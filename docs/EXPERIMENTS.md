@@ -89,10 +89,7 @@ Smoke metrics must not be substituted for manuscript results.
 
 Regression tests cover the published defaults, full UTR partition sizes, grouped
 split disjointness, gradient propagation through tied stems, scaffold validity,
-checkpoint export and post-decoding scoring. The port was additionally compared
-with the original toehold source: identically seeded models, forward outputs and
-guided/unguided samples matched exactly in the same environment, and the
-archived seed-42 predictor and denoiser checkpoints loaded without key conversion.
+checkpoint export and post-decoding scoring.
 
 ## Historical UTR discrepancies
 
