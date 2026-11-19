@@ -68,6 +68,12 @@ class BenchmarkProtocolTests(unittest.TestCase):
         self.assertEqual(utr.clipping_bounds(labels, [0, 1], "train"), (1.0, 2.0))
         self.assertEqual(utr.clipping_bounds(labels, [0, 1], "encoded_dataset"), (1.0, 100.0))
 
+    def test_utr_evaluation_does_not_advance_the_rng(self):
+        predictor = utr.ScalarPredictor().eval()
+        state = torch.get_rng_state().clone()
+        utr.predict(predictor, torch.zeros(3, 4, 50), 2, torch.device("cpu"))
+        self.assertTrue(torch.equal(state, torch.get_rng_state()))
+
     def test_utr_loader_rejects_the_wrong_benchmark_table(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "input.csv"

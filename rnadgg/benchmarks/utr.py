@@ -21,7 +21,7 @@ from ..sequence import decode_one_hot, sequences_to_tensor
 from ..utils import set_seed
 from .gan import sample_gan, train_gan
 from .models import UNet1D
-from .toehold import Diffusion, overlap_counts, predict, train_diffusion
+from .toehold import Diffusion, overlap_counts, train_diffusion
 
 
 @dataclass(frozen=True)
@@ -81,6 +81,16 @@ def load_data(path, sequence_column=None, label_column="r1", smoke=False):
     if sequences.duplicated().any():
         raise ValueError("Duplicate UTR sequences would violate the manuscript sequence-level split.")
     return sequences.tolist(), torch.tensor(labels.to_numpy(), dtype=torch.float32)
+
+
+@torch.no_grad()
+def predict(model, features, batch_size, device):
+    """Score fixed batches without advancing the training or sampling RNG."""
+    model.eval()
+    return np.concatenate([
+        model(features[start:start + batch_size].to(device)).cpu().numpy()
+        for start in range(0, len(features), batch_size)
+    ])
 
 
 def fit_predictor(features, labels, splits, config, device):
