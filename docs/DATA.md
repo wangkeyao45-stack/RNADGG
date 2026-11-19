@@ -9,6 +9,7 @@ Place the following files under `data/processed/`:
 ```text
 rbs_data.csv
 rbs_data_f.csv
+processed_data.csv
 utr_data.csv
 toehold_data.csv
 toehold_data_f.csv
@@ -27,6 +28,10 @@ GSM3130443_designed_library.csv
 - Toehold-switch data: "A deep learning approach to programmable RNA switches", DOI: `10.1038/s41467-020-18677-1`.
 
 ## Input handling
+
+The UTR manuscript experiments require `processed_data.csv`, containing 280,000 unique 50-nt sequences and the label column `r1`. The older `utr_data.csv` has 100,017 rows and an `rl` column and is a different processed library. The benchmark driver rejects a different row count unless `--smoke` is used. It does not pad, truncate or silently substitute datasets. The original Chinese sequence-column header is supported.
+
+The grouped toehold driver requires `full_sequence`, `ON` and `OFF`. The manuscript input contains 44,859 rows representing 44,660 unique full sequences. Rows sharing a full sequence remain in the same partition. A matching raw `toehold_data.csv` can also be supplied explicitly if it has the same rows and labels as the filtered benchmark input; verify the exported split manifest against the archive.
 
 CSV loading strips surrounding whitespace and converts sequences to uppercase. Rows with missing or empty sequences, nonnumeric labels, or infinite labels are excluded. A table without any usable rows raises an error.
 

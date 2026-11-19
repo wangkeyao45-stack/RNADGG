@@ -89,9 +89,11 @@ schedule, `alpha_bar_T` is approximately 0.00635, so the terminal state still
 retains a signal coefficient of approximately 0.0797. Initialization from a
 standard Gaussian is an approximation to this terminal distribution.
 
-The shared package and compact RBS example do not include the scaffold-projection
-procedure used in the manuscript's constrained toehold analysis. See
-[REPRODUCIBILITY.md](REPRODUCIBILITY.md) for the release scope.
+The generic `GaussianDiffusion` and compact RBS example do not apply scaffold
+projection. The dedicated `benchmarks/toehold.py` driver projects the state at
+initialization and every reverse step, differentiates through the tied stems,
+and uses `gamma_t = gamma * t / T`. These settings apply to both guided and
+unguided scaffold-constrained libraries. See [EXPERIMENTS.md](EXPERIMENTS.md).
 
 ## References
 

@@ -25,6 +25,8 @@ dependencies = [
 
 [project.scripts]
 rnadgg-smoke = "rnadgg.smoke:run_smoke_test"
+rnadgg-utr = "rnadgg.benchmarks.utr:main"
+rnadgg-toehold = "rnadgg.benchmarks.toehold:main"
 
 [tool.setuptools.packages.find]
 include = ["rnadgg*"]

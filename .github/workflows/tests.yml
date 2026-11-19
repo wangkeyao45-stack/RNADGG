@@ -31,4 +31,7 @@ jobs:
         run: python scripts/check_release.py
       - name: Check installed command outside the source tree
         working-directory: ${{ runner.temp }}
-        run: rnadgg-smoke
+        run: |
+          rnadgg-smoke
+          rnadgg-utr --help
+          rnadgg-toehold --help

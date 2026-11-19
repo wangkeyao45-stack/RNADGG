@@ -8,6 +8,13 @@ from rnadgg.data import load_sequence_table
 
 
 class DataTests(unittest.TestCase):
+    def test_original_dataset_sequence_header_is_recognized(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "input.csv"
+            pd.DataFrame({"\u5e8f\u5217": ["ACGT"], "rl": [1]}).to_csv(path, index=False)
+            sequences, _, _ = load_sequence_table(path)
+        self.assertEqual(sequences, ["ACGT"])
+
     def test_missing_sequences_and_nonfinite_labels_are_excluded(self):
         frame = pd.DataFrame({
             "sequence": [" acgu ", None, " ", "ACGT", "AAAA", "CCCC", "GGGG"],

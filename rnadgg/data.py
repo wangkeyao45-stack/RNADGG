@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 
-COMMON_SEQUENCE_COLUMNS = ("sequence", "Sequence", "seq", "Seq", "utr", "rbs", "trigger", "搴忓垪")
+COMMON_SEQUENCE_COLUMNS = ("sequence", "Sequence", "seq", "Seq", "utr", "rbs", "trigger", "\u5e8f\u5217")
 COMMON_LABEL_COLUMNS = ("label", "score", "rl", "MRL", "mrl", "ON", "OFF", "on", "off")
 
 

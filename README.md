@@ -2,7 +2,7 @@
 
 Gradient-guided diffusion for functional regulatory RNA sequence design.
 
-RNADGG combines a Gaussian diffusion model with function predictors trained on experimental RNA libraries to generate sequences toward desired activity. This repository contains the shared model components, gradient guidance, data-loading utilities and a compact RBS example. The predictor class retains the name `OracleCNN` for compatibility with earlier code.
+RNADGG combines a Gaussian diffusion model with function predictors trained on experimental RNA libraries to generate sequences toward desired activity. This repository contains the shared model components, gradient guidance, data-loading utilities, a compact RBS example, UTR experiments and the grouped toehold weight series. The predictor class retains the name `OracleCNN` for compatibility with earlier code.
 
 <p align="center">
   <img src="docs/graphic_abstract.png" alt="RNADGG graphical abstract" width="850"/>
@@ -113,9 +113,23 @@ The output directory contains `generated_sequences.csv`, the predictor and denoi
 
 See [docs/DIFFUSION.md](docs/DIFFUSION.md) for the equations and their implementation, including the distinction between the one-hot input mean of 0.25 and the noise mean of 0.
 
+## UTR and toehold experiments
+
+The UTR benchmark uses the 280,000-row `processed_data.csv` table with `r1` activity labels. The toehold benchmark uses 44,859 rows and groups duplicate full sequences before splitting.
+
+```bash
+python scripts/run_diffusion_utr.py --data data/processed/processed_data.csv --profile main
+python scripts/run_diffusion_utr.py --data data/processed/processed_data.csv --profile guidance
+python scripts/run_diffusion_toehold.py --data data/processed/toehold_data_f.csv
+```
+
+The main UTR comparison uses seeds 42, 43, 44, 123 and 456, with 2,048 sampled records per method. The grouped toehold series uses seeds 42, 43 and 44, with 1,024 sequences for unguided generation and each of five ON/OFF weight settings. Full runs train models and require substantial compute. Use `--dry-run` to validate the input and export splits, or `--smoke --seeds 42 --device cpu` for a small execution check. Smoke results are marked as validation-only.
+
+The installed commands `rnadgg-utr` and `rnadgg-toehold` accept the same arguments. See [docs/EXPERIMENTS.md](docs/EXPERIMENTS.md) for settings, outputs and the differences between current manuscript settings and the archived UTR comparison.
+
 ## Scope of this release
 
-The RBS command is a compact example, not a frozen reproduction of every manuscript benchmark. Full reproduction additionally requires the task-specific UTR and toehold drivers, exact data partitions, generated sequence libraries, benchmark tables, configurations and model checkpoints. Until those artifacts are deposited, the repository should be interpreted as an illustrative implementation of the shared method rather than a complete manuscript reproduction package.
+The RBS command is a compact example. The UTR and grouped-toehold commands provide task-specific training and generation, split manifests, checkpoints and result tables. Exact historical reproduction also requires the original processed datasets and archived sequence libraries. The historical UTR predictor, diffusion minibatch and clipping range differ from the current manuscript; both configurations are documented, and the current manuscript settings are the default. Figure 5's separate unprojected 200-sequence analysis and independent-predictor rescoring are not yet provided as frozen reproduction pipelines.
 
 See [docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md) for details.
 

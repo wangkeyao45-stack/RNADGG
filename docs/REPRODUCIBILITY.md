@@ -44,7 +44,7 @@ Predictor gradients are computed from a sum of per-sequence objectives, so their
 
 ## 5. Manuscript-level reproduction
 
-The current RBS driver is a compact example and does not freeze the complete manuscript protocol. Full manuscript-level reproduction requires an external archive containing the exact processed datasets, split manifests, task-specific configurations and drivers, generated sequence libraries, benchmark tables and checkpoints.
+The RBS driver is a compact example. UTR training, guidance sweeps and RNN-GAN comparisons, and the grouped scaffold-constrained toehold series are available as task-specific drivers. [EXPERIMENTS.md](EXPERIMENTS.md) maps their settings to the manuscript and records the historical UTR discrepancies. Every run saves its effective configuration and data partition manifest. Exact historical reproduction requires the original processed data and frozen generated libraries and checkpoints.
 
 ## 6. Output policy
 
@@ -52,4 +52,4 @@ Write generated checkpoints, figures, logs and sequence libraries to `models/` o
 
 ## Known limitations of this code release
 
-The repository does not yet include the complete UTR and constrained-toehold workflows, RNN-GAN comparisons, independent-Oracle rescoring, or the frozen source libraries used for every manuscript figure. The public RBS script also uses compact defaults intended for code inspection and small runs. These limitations should be resolved before describing the repository as a complete reproduction package.
+The unprojected 200-sequence Figure 5 analysis, independent-predictor rescoring and all frozen source libraries are not yet packaged as complete reproduction pipelines. The historical UTR settings disagree with the current manuscript in three documented places. The public RBS script uses compact defaults intended for code inspection and small runs. See EXPERIMENTS.md before comparing new runs with published tables.
